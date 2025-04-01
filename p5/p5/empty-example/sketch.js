@@ -1,7 +1,11 @@
 let trump;
 let objetos = [];
+let bolas = [];
 let pontos = 0;
-let imgTrump, imgDinheiro, imgBandeiraMexico, imgBandeiraBrasil, imgBandeiraCuba;
+let bandeirasBrasilColetadas = 0;
+let inimigoApareceu = false;
+let gameOver = false;
+let imgTrump, imgDinheiro, imgBandeiraMexico, imgBandeiraBrasil, imgBandeiraCuba, imgLula, imgPicanha;
 
 function preload() {
   imgTrump = loadImage('images/trump.png');
@@ -9,6 +13,8 @@ function preload() {
   imgBandeiraMexico = loadImage('images/bandeiraMexico.png');
   imgBandeiraBrasil = loadImage('images/bandeiraBrasil.png');
   imgBandeiraCuba = loadImage('images/bandeiraCuba.png');
+  imgLula = loadImage('images/lula.png');  // Carregando a imagem do Lula
+  imgPicanha = loadImage('images/picanha.png');  // Carregando a imagem da picanha
 }
 
 function setup() {
@@ -17,11 +23,26 @@ function setup() {
 }
 
 function draw() {
+  if (gameOver) {
+    background(0);
+    textSize(50);
+    fill(255, 0, 0); text("FEZ O L", width / 3, height / 2);
+    return;
+  }
+
   background(200);
   displayScore();
   trump.show();
   trump.move();
-  handleObjects();
+  
+  if (!inimigoApareceu) {
+    handleObjects();
+  } else {
+    inimigo.show();
+    inimigo.shoot();
+  }
+
+  handleBolas();
 }
 
 function displayScore() {
@@ -31,7 +52,7 @@ function displayScore() {
 }
 
 function handleObjects() {
-  if (frameCount % 30 === 0) {
+  if (bandeirasBrasilColetadas < 13 && frameCount % 30 === 0) {
     let tipoObjeto = random(["dinheiro", "bandeira_mexico", "bandeira_brasil", "bandeira_cuba"]);
     objetos.push(new Objeto(tipoObjeto));
   }
@@ -50,11 +71,35 @@ function handleObjects() {
       objetos.splice(i, 1);
     }
   }
+
+  // Se atingiu 2 bandeiras do Brasil, aparece o inimigo
+  if (bandeirasBrasilColetadas >= 2 && !inimigoApareceu) {
+    inimigoApareceu = true;
+    inimigo = new Inimigo();
+  }
+}
+
+function handleBolas() {
+  for (let i = bolas.length - 1; i >= 0; i--) {
+    bolas[i].fall();
+    bolas[i].show();
+
+    if (bolas[i].hits(trump)) {
+      gameOver = true;
+    }
+
+    if (bolas[i].y > height) {
+      bolas.splice(i, 1);
+    }
+  }
 }
 
 function updateScore(tipo) {
   if (tipo === "dinheiro") {
     pontos += 10;
+  } else if (tipo === "bandeira_brasil") {
+    bandeirasBrasilColetadas += 1;
+    pontos -= 5;
   } else {
     pontos -= 5;
   }
@@ -129,4 +174,63 @@ class Objeto {
     let d = dist(this.x + this.size / 2, this.y + this.size / 2, trump.x + trump.size / 2, trump.y + trump.size / 2);
     return d < (this.size / 2 + trump.size / 2);
   }
+}
+
+class Inimigo {
+  constructor() {
+    this.x = width / 2;
+    this.y = 50;
+    this.size = 80;
+  }
+
+  show() {
+    if (imgLula) {
+      image(imgLula, this.x, this.y, this.size, this.size);  // Exibindo a imagem do Lula
+    } else {
+      fill(255, 0, 0);
+      ellipse(this.x, this.y, this.size);
+    }
+  }
+
+  shoot() {
+    if (frameCount % 60 === 0) {
+      bolas.push(new Bola(this.x, this.y));
+    }
+  }
+}
+
+class Bola {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = 30;  // Tamanho da picanha ajustado
+    this.speed = 6;
+  }
+
+  fall() {
+    this.y += this.speed;
+  }
+
+  show() {
+    if (imgPicanha) {
+      image(imgPicanha, this.x, this.y, this.size, this.size);  // Exibindo a imagem de picanha como projétil
+    } else {
+      fill(255, 0, 0);
+      ellipse(this.x, this.y, this.size);
+    }
+  }
+
+  hits(trump) {
+    let d = dist(this.x, this.y, trump.x + trump.size / 2, trump.y + trump.size / 2);
+    return d < (this.size / 2 + trump.size / 2);
+  }
+}
+
+function resetGame() {
+  pontos = 0;
+  bandeirasBrasilColetadas = 0;
+  objetos = [];
+  bolas = [];
+  inimigoApareceu = false;
+  gameOver = false;
 }
