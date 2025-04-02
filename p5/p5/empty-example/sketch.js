@@ -26,7 +26,7 @@ function draw() {
   if (gameOver) {
     background(0);
     textSize(50);
-    fill(255, 0, 0); text("FEZ O L", width / 3, height / 2);
+    fill(255, 0, 0); text("VOCE FEZ O L !", width / 3.2, height / 2);
     return;
   }
 
@@ -73,7 +73,7 @@ function handleObjects() {
   }
 
   // Se atingiu 2 bandeiras do Brasil, aparece o inimigo
-  if (bandeirasBrasilColetadas >= 2 && !inimigoApareceu) {
+  if (bandeirasBrasilColetadas >= 5 && !inimigoApareceu) {
     inimigoApareceu = true;
     inimigo = new Inimigo();
   }
@@ -178,9 +178,9 @@ class Objeto {
 
 class Inimigo {
   constructor() {
-    this.x = width / 2;
-    this.y = 50;
-    this.size = 80;
+    this.x = width/2.33;
+    this.y = 25;
+    this.size = 120;
   }
 
   show() {
@@ -203,7 +203,7 @@ class Bola {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.size = 30;  // Tamanho da picanha ajustado
+    this.size = 75;  // Tamanho da picanha ajustado
     this.speed = 6;
   }
 
