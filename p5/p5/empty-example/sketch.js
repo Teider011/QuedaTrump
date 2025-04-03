@@ -13,8 +13,8 @@ function preload() {
   imgBandeiraMexico = loadImage('images/bandeiraMexico.png');
   imgBandeiraBrasil = loadImage('images/bandeiraBrasil.png');
   imgBandeiraCuba = loadImage('images/bandeiraCuba.png');
-  imgLula = loadImage('images/lula.png');  // Carregando a imagem do Lula
-  imgPicanha = loadImage('images/picanha.png');  // Carregando a imagem da picanha
+  imgLula = loadImage('images/lula.png');
+  imgPicanha = loadImage('images/picanha.png');
 }
 
 function setup() {
@@ -26,7 +26,8 @@ function draw() {
   if (gameOver) {
     background(0);
     textSize(50);
-    fill(255, 0, 0); text("VOCE FEZ O L !", width / 3.2, height / 2);
+    fill(255, 0, 0);
+    text("VOCE FEZ O L !", width / 3.2, height / 2);
     return;
   }
 
@@ -72,7 +73,6 @@ function handleObjects() {
     }
   }
 
-  // Se atingiu 2 bandeiras do Brasil, aparece o inimigo
   if (bandeirasBrasilColetadas >= 5 && !inimigoApareceu) {
     inimigoApareceu = true;
     inimigo = new Inimigo();
@@ -157,16 +157,11 @@ class Objeto {
 
   getImage() {
     switch (this.tipo) {
-      case "dinheiro":
-        return imgDinheiro;
-      case "bandeira_mexico":
-        return imgBandeiraMexico;
-      case "bandeira_brasil":
-        return imgBandeiraBrasil;
-      case "bandeira_cuba":
-        return imgBandeiraCuba;
-      default:
-        return null;
+      case "dinheiro": return imgDinheiro;
+      case "bandeira_mexico": return imgBandeiraMexico;
+      case "bandeira_brasil": return imgBandeiraBrasil;
+      case "bandeira_cuba": return imgBandeiraCuba;
+      default: return null;
     }
   }
 
@@ -178,14 +173,14 @@ class Objeto {
 
 class Inimigo {
   constructor() {
-    this.x = width/2.33;
+    this.x = width / 2.33;
     this.y = 25;
     this.size = 120;
   }
 
   show() {
     if (imgLula) {
-      image(imgLula, this.x, this.y, this.size, this.size);  // Exibindo a imagem do Lula
+      image(imgLula, this.x, this.y, this.size, this.size);
     } else {
       fill(255, 0, 0);
       ellipse(this.x, this.y, this.size);
@@ -203,17 +198,23 @@ class Bola {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.size = 75;  // Tamanho da picanha ajustado
+    this.size = 75;
     this.speed = 6;
   }
 
   fall() {
-    this.y += this.speed;
+    let targetX = trump.x + trump.size / 2;
+    let targetY = trump.y + trump.size / 2;
+    let dx = targetX - this.x;
+    let dy = targetY - this.y;
+    let angle = atan2(dy, dx);
+    this.x += this.speed * cos(angle);
+    this.y += this.speed * sin(angle);
   }
 
   show() {
     if (imgPicanha) {
-      image(imgPicanha, this.x, this.y, this.size, this.size);  // Exibindo a imagem de picanha como projétil
+      image(imgPicanha, this.x, this.y, this.size, this.size);
     } else {
       fill(255, 0, 0);
       ellipse(this.x, this.y, this.size);
@@ -226,11 +227,3 @@ class Bola {
   }
 }
 
-function resetGame() {
-  pontos = 0;
-  bandeirasBrasilColetadas = 0;
-  objetos = [];
-  bolas = [];
-  inimigoApareceu = false;
-  gameOver = false;
-}
