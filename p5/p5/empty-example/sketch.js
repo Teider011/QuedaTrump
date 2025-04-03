@@ -5,6 +5,8 @@ let pontos = 0;
 let bandeirasBrasilColetadas = 0;
 let inimigoApareceu = false;
 let gameOver = false;
+let startTime;
+let elapsedTime = 0;
 let imgTrump, imgDinheiro, imgBandeiraMexico, imgBandeiraBrasil, imgBandeiraCuba, imgLula, imgPicanha;
 
 function preload() {
@@ -20,6 +22,7 @@ function preload() {
 function setup() {
   createCanvas(800, 600);
   trump = new Trump(width / 1.5 , height - 80);
+  startTime = millis();
 }
 
 function draw() {
@@ -33,6 +36,7 @@ function draw() {
 
   background(200);
   displayScore();
+  displayTimer();
   trump.show();
   trump.move();
   
@@ -50,6 +54,13 @@ function displayScore() {
   textSize(24);
   fill(0);
   text('Pontos: ' + pontos, 350, 30);
+}
+
+function displayTimer() {
+  elapsedTime = int((millis() - startTime) / 1000);
+  textSize(24);
+  fill(0);
+  text('Tempo: ' + elapsedTime + 's', 600, 30);
 }
 
 function handleObjects() {
@@ -73,7 +84,7 @@ function handleObjects() {
     }
   }
 
-  if (bandeirasBrasilColetadas >= 5 && !inimigoApareceu) {
+  if (bandeirasBrasilColetadas >= 13 && !inimigoApareceu) {
     inimigoApareceu = true;
     inimigo = new Inimigo();
   }
@@ -226,4 +237,3 @@ class Bola {
     return d < (this.size / 2 + trump.size / 2);
   }
 }
-
